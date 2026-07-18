@@ -493,7 +493,8 @@ class DJApp:
         """Vrai si le fichier source contient une pochette (flux vidéo/image)."""
         try:
             r = subprocess.run(
-                [self.ffmpeg, "-i", src_p], capture_output=True, text=True)
+                [self.ffmpeg, "-i", src_p], capture_output=True,
+                text=True, encoding="utf-8", errors="replace")
             # FFmpeg écrit les infos sur stderr ; on cherche un flux Video
             return "Video:" in r.stderr
         except Exception:
