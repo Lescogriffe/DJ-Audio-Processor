@@ -19,4 +19,4 @@ Fonctionnement techniqueLe logiciel gère les formats audio standards (mp3, wav,
 Il traite les fichiers de manière récursive si l'option est activée.  
 Le script inclut un système de sécurité pour éviter de retraitée inutilement des fichiers déjà traités (suffixe _TAP).
 
-![Capture](Capture.png)  
+![Mon logiciel](./Capture.png)  
