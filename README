@@ -1,4 +1,5 @@
-DJ Audio ProcessorUn outil simple et efficace pour le traitement audio par lots, conçu pour automatiser les tâches répétitives des DJ et producteurs.
+DJ Audio Processor
+Un outil simple et efficace pour le traitement audio par lots, conçu pour automatiser les tâches répétitives des DJ et producteurs.
 FonctionnalitésLe logiciel propose deux modes de traitement principaux :
 Mode Loudness (TAP) : Normalisation du volume sonore (LUFS) et application d'un limiteur True-Peak pour garantir une qualité constante et éviter la saturation.
 Inclut une fonction de déclippage intelligent pour restaurer les crêtes écrêtées.  
