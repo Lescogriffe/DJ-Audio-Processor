@@ -1,0 +1,12 @@
+DJ Audio ProcessorUn outil simple et efficace pour le traitement audio par lots, conçu pour automatiser les tâches répétitives des DJ et producteurs.FonctionnalitésLe logiciel propose deux modes de traitement principaux :Mode Loudness (TAP) : Normalisation du volume sonore (LUFS) et application d'un limiteur True-Peak pour garantir une qualité constante et éviter la saturation.  Inclut une fonction de déclippage intelligent pour restaurer les crêtes écrêtées.  Gestion automatique des métadonnées et de la pochette d'album lors de l'export.  Mode Stems (Séparation) : Utilise le modèle IA Demucs pour isoler les pistes individuelles (Vocals, Batterie, Basse, Mélodie).  Permet de choisir précisément quels "stems" extraire.  Gestion automatique des dossiers de sortie.  
+PrérequisFFmpeg : Doit être installé et accessible dans le PATH système.  
+Python : Le script nécessite les dépendances suivantes :  Bashpip install pedalboard pyloudnorm soundfile numpy demucs torch
+(Optionnel) tkinterdnd2-universal pour activer le glisser-déposer des fichiers. 
+UtilisationPlacez vos fichiers audio dans un dossier.Lancez le logiciel via le fichier TRAITER_TOUT.bat.  
+Utilisez l'interface graphique pour :Sélectionner le dossier source et le dossier de destination. 
+Choisir le mode de traitement (Loudness ou Stems).  
+Lancer le traitement et suivre la progression via les barres de statut.  
+Un rapport détaillé est généré automatiquement dans le dossier de sortie après chaque opération.  
+Fonctionnement techniqueLe logiciel gère les formats audio standards (mp3, wav, flac, etc.).  
+Il traite les fichiers de manière récursive si l'option est activée.  
+Le script inclut un système de sécurité pour éviter de retraitée inutilement des fichiers déjà traités (suffixe _TAP).  
