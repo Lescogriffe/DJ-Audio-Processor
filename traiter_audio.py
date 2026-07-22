@@ -155,6 +155,7 @@ class DJApp:
         self.found_files = []
         self.skipped_files = []
         self.dropped_files = []   # fichiers glissés-déposés directement
+        self._drop_root = ""      # racine commune des fichiers déposés (arbo)
         self.out_fmt = tk.StringVar(value="flac")
         self.mode = tk.StringVar(value="loudness")   # "loudness" ou "stems"
         self.stem_model = tk.StringVar(value="htdemucs_ft")
@@ -347,8 +348,39 @@ class DJApp:
             self.dst = os.path.normpath(d)
             self.current_lbl.config(text=f"Destination : {self.dst}")
 
+    def _rel_subdir(self, src_p):
+        """
+        Sous-dossier de sortie à recréer pour ce fichier, calculé à partir
+        de sa position sous la racine source. Renvoie "" si le fichier est
+        directement à la racine (ou hors arborescence : fichiers déposés
+        depuis des dossiers différents).
+        """
+        if self.dropped_files:
+            # Racine = plus grand dossier commun aux fichiers déposés.
+            base = self._drop_root
+        else:
+            base = self.src
+        if not base:
+            return ""
+        try:
+            rel = os.path.relpath(os.path.dirname(src_p), base)
+        except ValueError:
+            return ""   # disques différents sous Windows
+        if rel == "." or rel.startswith(".."):
+            return ""
+        return rel
+
     def _scan_files(self):
         to_process, skipped = [], []
+        # Racine commune des fichiers déposés (pour reconstruire l'arbo).
+        if self.dropped_files:
+            dirs = [os.path.dirname(p) for p in self.dropped_files]
+            try:
+                self._drop_root = os.path.commonpath(dirs)
+            except ValueError:
+                self._drop_root = ""
+        else:
+            self._drop_root = ""
 
         # Si des fichiers ont été déposés directement, on ne scanne pas de
         # dossier : on traite exactement cette sélection.
@@ -461,7 +493,12 @@ class DJApp:
         args, ext = ENCODERS[self.out_fmt.get()]
         base = os.path.splitext(os.path.basename(src_p))[0]
         out_name = f"{base}{TAP_SUFFIX}.{ext}"
-        dst_p = os.path.join(self.dst, out_name)
+        subdir = self._rel_subdir(src_p)
+        out_root = os.path.join(self.dst, subdir) if subdir else self.dst
+        os.makedirs(out_root, exist_ok=True)
+        dst_p = os.path.join(out_root, out_name)
+        # Nom affiché/rapporté : on garde le chemin relatif pour la lisibilité.
+        out_name = os.path.join(subdir, out_name) if subdir else out_name
 
         # On récupère la pochette du fichier d'origine (2e entrée), qu'on
         # réinjecte dans le fichier traité. -map 0:a = l'audio retraité,
@@ -534,7 +571,9 @@ class DJApp:
         base = os.path.splitext(os.path.basename(src_p))[0]
         # Nom de dossier : "Titre [vocals+bass]"
         tag = "+".join(chosen_stems)
-        out_dir = os.path.join(self.dst, safe_name(f"{base} [{tag}]"))
+        subdir = self._rel_subdir(src_p)
+        out_root = os.path.join(self.dst, subdir) if subdir else self.dst
+        out_dir = os.path.join(out_root, safe_name(f"{base} [{tag}]"))
         os.makedirs(out_dir, exist_ok=True)
 
         written = []
@@ -544,7 +583,7 @@ class DJApp:
             out_path = os.path.join(out_dir, f"{safe_name(base)}_{name}.wav")
             save_audio(source.cpu(), out_path, samplerate=model.samplerate)
             written.append(f"{name}.wav")
-        return os.path.basename(out_dir), written
+        return os.path.relpath(out_dir, self.dst), written
 
     @staticmethod
     def _fmt_db(v):
